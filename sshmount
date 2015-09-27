@@ -1,0 +1,37 @@
+#!/bin/bash
+
+#USER=${1%@*}
+#HOST=${1#*@}
+URL=$1
+PRG_HANDLER="$2"
+OLD_IFS=$IFS
+IFS="@:"
+set -- $URL
+USER="$1"
+HOST="$2"
+PORT="$3"
+IFS=$OLD_IFS
+
+if [ -z "$HOST" ]; then
+	HOST=$USER
+	USER=""
+fi
+if [ -n "$PORT" ]; then
+	portarg="-p ${PORT}"
+fi
+if [ -n "$USER" ]; then
+	USER="${USER}@"
+fi
+MOUNT_DIR="${HOME}/sshfs"
+NET_CMD="sshfs -o umask=0002,reconnect,workaround=rename:nodelaysrv:buflimit ${portarg}"
+
+mkdir "${MOUNT_DIR}/${HOST}"
+${NET_CMD} ${USER}${HOST}:/ "${MOUNT_DIR}/${HOST}"
+if [ -n "${PRG_HANDLER}" ]; then
+    ${PRG_HANDLER} "${MOUNT_DIR}/${HOST}"
+fi
+
+#echo "Port: '${PORT}'"
+#echo "${MOUNT_DIR}/${HOST}"
+#echo ${NET_CMD} ${USER}${HOST}:/ "${MOUNT_DIR}/${HOST}"
+#echo ${PRG_HANDLER} "${MOUNT_DIR}/${HOST}"

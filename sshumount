@@ -1,0 +1,7 @@
+#!/bin/bash
+
+MOUNT_DIR="${HOME}/sshfs"
+UMOUNT_CMD="fusermount -u"
+
+find ${MOUNT_DIR}/* -maxdepth 0 -type d -execdir ${UMOUNT_CMD} {} \;
+find ${MOUNT_DIR}/* -maxdepth 0 -type d -execdir rmdir {} \;
